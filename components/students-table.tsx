@@ -170,19 +170,28 @@ export function StudentsTable() {
 
   if (loading) {
     return (
-      <Card className="animate-pulse">
+      <Card className="w-full">
         <CardHeader>
-          <div className="h-6 bg-muted rounded w-1/4"></div>
+          <CardTitle>Student Directory</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            <div className="h-10 bg-muted rounded"></div>
-            <div className="space-y-2">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="h-12 bg-muted rounded"></div>
-              ))}
-            </div>
+          <div className="h-64 flex items-center justify-center">
+            <div className="animate-pulse text-muted-foreground">Loading student data...</div>
           </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  if (students.length === 0) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle>Student Directory</CardTitle>
+        </CardHeader>
+        <CardContent className="text-center p-8">
+          <p className="text-muted-foreground mb-4">No student data available.</p>
+          <p className="text-sm text-muted-foreground">Please upload a CSV file to view student records.</p>
         </CardContent>
       </Card>
     )

@@ -52,7 +52,15 @@ export function OverviewCards() {
     )
   }
 
-  if (!data) return null
+  if (!data) {
+    return (
+      <Card className="col-span-full">
+        <CardContent className="p-6 text-center">
+          <p className="text-muted-foreground">No data available. Please upload a dataset to view analytics.</p>
+        </CardContent>
+      </Card>
+    )
+  }
 
   const cards = [
     {

@@ -12,29 +12,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Upload, Database, RefreshCw } from "lucide-react"
 
 export default function DashboardPage() {
-  const [showUpload, setShowUpload] = useState(false)
-  const [dataSource, setDataSource] = useState<"sample" | "uploaded">("sample")
+  const [showUpload, setShowUpload] = useState(true)
   const [refreshKey, setRefreshKey] = useState(0)
 
   const handleUploadSuccess = () => {
-    setDataSource("uploaded")
     setShowUpload(false)
     setRefreshKey((prev) => prev + 1)
-  }
-
-  const resetToSampleData = async () => {
-    try {
-      const response = await fetch("/api/reset-data", {
-        method: "POST",
-      })
-
-      if (response.ok) {
-        setDataSource("sample")
-        setRefreshKey((prev) => prev + 1)
-      }
-    } catch (error) {
-      console.error("Failed to reset data:", error)
-    }
   }
 
   return (
@@ -51,14 +34,14 @@ export default function DashboardPage() {
             <CardDescription>Choose between sample data or upload your own student dataset</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <div className={`w-3 h-3 rounded-full ${dataSource === "sample" ? "bg-blue-500" : "bg-gray-300"}`} />
-                <span className="text-sm">
-                  {dataSource === "sample" ? "Using Sample Data (250 students)" : "Using Uploaded Data"}
-                </span>
-              </div>
-              <div className="flex gap-2">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-blue-500" />
+                  <span className="text-sm">
+                    Upload your dataset to begin
+                  </span>
+                </div>
                 <Button
                   variant="outline"
                   size="sm"
@@ -66,27 +49,16 @@ export default function DashboardPage() {
                   className="flex items-center gap-2"
                 >
                   <Upload className="h-4 w-4" />
-                  Upload Dataset
+                  {showUpload ? 'Hide Upload' : 'Upload Dataset'}
                 </Button>
-                {dataSource === "uploaded" && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={resetToSampleData}
-                    className="flex items-center gap-2 bg-transparent"
-                  >
-                    <RefreshCw className="h-4 w-4" />
-                    Use Sample Data
-                  </Button>
-                )}
               </div>
+              
+              {showUpload && (
+                <div className="pt-4 border-t">
+                  <FileUpload onUploadSuccess={handleUploadSuccess} />
+                </div>
+              )}
             </div>
-
-            {showUpload && (
-              <div className="pt-4 border-t">
-                <FileUpload onUploadSuccess={handleUploadSuccess} />
-              </div>
-            )}
           </CardContent>
         </Card>
 

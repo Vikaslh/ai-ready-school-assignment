@@ -66,23 +66,27 @@ export function ChartsSection() {
   if (loading) {
     return (
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="animate-pulse">
-          <CardHeader>
-            <div className="h-6 bg-muted rounded w-1/2"></div>
-          </CardHeader>
-          <CardContent>
-            <div className="h-64 bg-muted rounded"></div>
-          </CardContent>
-        </Card>
-        <Card className="animate-pulse">
-          <CardHeader>
-            <div className="h-6 bg-muted rounded w-1/2"></div>
-          </CardHeader>
-          <CardContent>
-            <div className="h-64 bg-muted rounded"></div>
-          </CardContent>
-        </Card>
+        {[1, 2].map((i) => (
+          <Card key={i} className="h-[400px] animate-pulse">
+            <CardHeader>
+              <div className="h-6 bg-muted rounded w-1/3"></div>
+            </CardHeader>
+            <CardContent className="h-[calc(100%-3.5rem)]">
+              <div className="h-full w-full bg-muted rounded"></div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
+    )
+  }
+
+  if (students.length === 0) {
+    return (
+      <Card className="col-span-full">
+        <CardContent className="p-6 text-center">
+          <p className="text-muted-foreground">No data available. Please upload a dataset to view charts.</p>
+        </CardContent>
+      </Card>
     )
   }
 
