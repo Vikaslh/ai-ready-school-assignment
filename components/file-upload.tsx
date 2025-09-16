@@ -11,13 +11,14 @@ import { Upload, FileText, AlertCircle, CheckCircle } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 
 interface FileUploadProps {
+  onUploadStart?: () => void
   onUploadSuccess: () => void
 }
 
-export function FileUpload({ onUploadSuccess }: FileUploadProps) {
+export function FileUpload({ onUploadStart, onUploadSuccess }: FileUploadProps) {
   const [file, setFile] = useState<File | null>(null)
   const [uploading, setUploading] = useState(false)
-  const [uploadStatus, setUploadStatus] = useState<"idle" | "success" | "error">("idle")
+  const [uploadStatus, setUploadStatus] = useState<"idle" | "uploading" | "success" | "error">("idle")
   const [errorMessage, setErrorMessage] = useState("")
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -93,8 +94,13 @@ export function FileUpload({ onUploadSuccess }: FileUploadProps) {
     if (!file) return
 
     setUploading(true)
-    setUploadStatus("idle")
+    setUploadStatus("uploading")
     setErrorMessage("")
+    
+    // Notify parent component that upload has started
+    if (onUploadStart) {
+      onUploadStart()
+    }
 
     try {
       const formData = new FormData()

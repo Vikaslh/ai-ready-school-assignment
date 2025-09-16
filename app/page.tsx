@@ -9,15 +9,28 @@ import { InsightsSection } from "@/components/insights-section"
 import { FileUpload } from "@/components/file-upload"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Upload, Database, RefreshCw } from "lucide-react"
+import { Upload, Database, CheckCircle, AlertCircle } from "lucide-react"
 
 export default function DashboardPage() {
   const [showUpload, setShowUpload] = useState(true)
   const [refreshKey, setRefreshKey] = useState(0)
+  const [uploadStatus, setUploadStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>('idle')
+
+  const handleUploadStart = () => {
+    setUploadStatus('uploading')
+  }
 
   const handleUploadSuccess = () => {
-    setShowUpload(false)
-    setRefreshKey((prev) => prev + 1)
+    console.log('[Dashboard] Upload successful, refreshing data...')
+    setUploadStatus('success')
+    
+    // Force a complete remount of child components by changing the key
+    setRefreshKey(prev => prev + 1)
+    
+    // Force a hard refresh of the page after a short delay
+    setTimeout(() => {
+      window.location.reload()
+    }, 1000)
   }
 
   return (
@@ -35,27 +48,55 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-blue-500" />
-                  <span className="text-sm">
-                    Upload your dataset to begin
-                  </span>
+              {uploadStatus === 'idle' && (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-blue-500" />
+                      <span className="text-sm">
+                        Upload your dataset to begin
+                      </span>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowUpload(!showUpload)}
+                      className="flex items-center gap-2"
+                    >
+                      <Upload className="h-4 w-4" />
+                      {showUpload ? 'Hide Upload' : 'Upload Dataset'}
+                    </Button>
+                  </div>
+                  
+                  {showUpload && (
+                    <div className="pt-4 border-t">
+                      <FileUpload 
+                        onUploadStart={handleUploadStart}
+                        onUploadSuccess={handleUploadSuccess} 
+                      />
+                    </div>
+                  )}
                 </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowUpload(!showUpload)}
-                  className="flex items-center gap-2"
-                >
-                  <Upload className="h-4 w-4" />
-                  {showUpload ? 'Hide Upload' : 'Upload Dataset'}
-                </Button>
-              </div>
+              )}
               
-              {showUpload && (
-                <div className="pt-4 border-t">
-                  <FileUpload onUploadSuccess={handleUploadSuccess} />
+              {uploadStatus === 'uploading' && (
+                <div className="flex items-center gap-2 p-4 border rounded-lg bg-muted/50">
+                  <div className="h-4 w-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                  <span className="text-sm">Uploading and processing data...</span>
+                </div>
+              )}
+              
+              {uploadStatus === 'success' && (
+                <div className="flex items-center gap-2 p-4 border rounded-lg bg-muted/50">
+                  <CheckCircle className="h-5 w-5 text-green-500" />
+                  <span className="text-sm">Dataset uploaded successfully! Refreshing data...</span>
+                </div>
+              )}
+              
+              {uploadStatus === 'error' && (
+                <div className="flex items-center gap-2 p-4 border rounded-lg bg-destructive/10">
+                  <AlertCircle className="h-5 w-5 text-destructive" />
+                  <span className="text-sm text-destructive">Error uploading dataset. Please try again.</span>
                 </div>
               )}
             </div>

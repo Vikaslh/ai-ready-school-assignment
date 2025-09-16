@@ -43,23 +43,39 @@ export function ChartsSection({ refreshKey = 0 }: ChartsSectionProps) {
   useEffect(() => {
     async function fetchData() {
       try {
+        console.log('[ChartsSection] Fetching data...')
         const [studentsResponse, analyticsResponse] = await Promise.all([
           fetch("/api/students"),
           fetch("/api/analytics"),
         ])
-
-        const studentsResult = await studentsResponse.json()
-        const analyticsResult = await analyticsResponse.json()
-
-        if (studentsResult.success) {
-          setStudents(studentsResult.data)
+        
+        const [studentsData, analyticsData] = await Promise.all([
+          studentsResponse.json(),
+          analyticsResponse.json()
+        ])
+        
+        console.log('[ChartsSection] Students data:', studentsData)
+        console.log('[ChartsSection] Analytics data:', analyticsData)
+        
+        if (studentsData.success) {
+          console.log('[ChartsSection] Setting students data...', studentsData.data.length, 'students')
+          setStudents(studentsData.data)
+        } else {
+          console.error('[ChartsSection] Error fetching students:', studentsData.error)
+          setStudents([])
         }
-        if (analyticsResult.success) {
-          setAnalytics(analyticsResult.data)
+        
+        if (analyticsData.success) {
+          console.log('[ChartsSection] Setting analytics data...', analyticsData.data ? 'data exists' : 'no data')
+          setAnalytics(analyticsData.data || { correlations: {} })
+        } else {
+          console.error('[ChartsSection] Error fetching analytics:', analyticsData.error)
+          setAnalytics({ correlations: {} })
         }
       } catch (error) {
         console.error("Failed to fetch chart data:", error)
       } finally {
+        console.log('[ChartsSection] Fetching data complete, setting loading state to false...')
         setLoading(false)
       }
     }
@@ -84,31 +100,39 @@ export function ChartsSection({ refreshKey = 0 }: ChartsSectionProps) {
     )
   }
 
-  if (students.length === 0) {
+  if (!Array.isArray(students) || students.length === 0) {
     return (
       <Card className="col-span-full">
         <CardContent className="p-6 text-center">
-          <p className="text-muted-foreground">No data available. Please upload a dataset to view charts.</p>
+          <p className="text-muted-foreground">No student data available. Please upload a dataset to view charts.</p>
+          <p className="text-xs text-muted-foreground mt-2">
+            {analytics ? 'Analytics data is available but no student records found.' : 'No analytics data available.'}
+          </p>
         </CardContent>
       </Card>
     )
   }
 
   // Prepare data for skills vs assessment score chart
-  const skillsData = analytics
+  const skillsData = analytics?.correlations 
     ? Object.entries(analytics.correlations).map(([skill, correlation]) => ({
         skill: skill.charAt(0).toUpperCase() + skill.slice(1).replace("_", " "),
-        correlation: Math.abs(correlation),
-        value: correlation,
+        correlation: Math.abs(Number(correlation)) || 0,
+        value: Number(correlation) || 0,
       }))
     : []
 
   // Prepare scatter plot data (attention vs assessment score)
-  const scatterData = students.map((student) => ({
-    attention: student.attention,
-    assessment_score: student.assessment_score,
-    name: student.name,
-  }))
+  const scatterData = Array.isArray(students) && students.length > 0
+    ? students.map((student) => ({
+        attention: Number(student.attention) || 0,
+        assessment_score: Number(student.assessment_score) || 0,
+        name: student.name || 'Unknown',
+      }))
+    : []
+  
+  console.log('[ChartsSection] Skills data:', skillsData)
+  console.log('[ChartsSection] Scatter data:', scatterData)
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
