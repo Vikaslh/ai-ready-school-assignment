@@ -221,6 +221,33 @@ export async function GET() {
     if (hasUploadedData()) {
       const uploadedDataset = getUploadedDataset()!
       console.log("[v0] Calculating analytics from uploaded dataset with", uploadedDataset.recordCount, "students")
+      
+      if (uploadedDataset.recordCount === 0) {
+        return NextResponse.json({
+          success: true,
+          data: {
+            overview: {
+              averageComprehension: 0,
+              averageAttention: 0,
+              averageFocus: 0,
+              averageRetention: 0,
+              averageEngagementTime: 0,
+              averageAssessmentScore: 0,
+            },
+            correlations: {},
+            featureImportance: [],
+            clusters: {},
+            keyFindings: [],
+            modelPerformance: {
+              accuracy: 0,
+              r2Score: 0
+            }
+          },
+          source: "uploaded",
+          recordCount: 0,
+        })
+      }
+      
       const analyticsData = calculateAnalytics(uploadedDataset.students)
 
       return NextResponse.json({
@@ -230,13 +257,28 @@ export async function GET() {
         recordCount: uploadedDataset.recordCount,
       })
     } else {
-      console.log("[v0] No uploaded data, using mock analytics")
-      const analyticsData = getMockAnalytics()
-
+      console.log("[v0] No uploaded data found")
       return NextResponse.json({
         success: true,
-        data: analyticsData,
-        source: "mock",
+        data: {
+          overview: {
+            averageComprehension: 0,
+            averageAttention: 0,
+            averageFocus: 0,
+            averageRetention: 0,
+            averageEngagementTime: 0,
+            averageAssessmentScore: 0,
+          },
+          correlations: {},
+          featureImportance: [],
+          clusters: {},
+          keyFindings: [],
+          modelPerformance: {
+            accuracy: 0,
+            r2Score: 0
+          }
+        },
+        source: "none",
       })
     }
   } catch (error) {

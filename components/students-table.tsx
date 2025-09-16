@@ -10,6 +10,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Search, ArrowUpDown, Eye, Download, Filter } from "lucide-react"
 import { DetailedStudentProfile } from "./detailed-student-profile"
 
+interface StudentsTableProps {
+  refreshKey?: number
+}
+
 interface Student {
   student_id: string
   name: string
@@ -37,7 +41,7 @@ const clusterColors = {
   3: "bg-red-100 text-red-800",
 }
 
-export function StudentsTable() {
+export function StudentsTable({ refreshKey = 0 }: StudentsTableProps) {
   const [students, setStudents] = useState<Student[]>([])
   const [filteredStudents, setFilteredStudents] = useState<Student[]>([])
   const [loading, setLoading] = useState(true)
@@ -55,11 +59,12 @@ export function StudentsTable() {
   useEffect(() => {
     async function fetchStudents() {
       try {
+        setLoading(true)
         const response = await fetch("/api/students")
         const result = await response.json()
         if (result.success) {
-          setStudents(result.data)
-          setFilteredStudents(result.data)
+          setStudents(result.data || [])
+          setFilteredStudents(result.data || [])
         }
       } catch (error) {
         console.error("Failed to fetch students:", error)
@@ -69,7 +74,7 @@ export function StudentsTable() {
     }
 
     fetchStudents()
-  }, [])
+  }, [refreshKey])
 
   useEffect(() => {
     const filtered = students.filter((student) => {

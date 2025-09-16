@@ -31,7 +31,11 @@ interface AnalyticsData {
   correlations: Record<string, number>
 }
 
-export function ChartsSection() {
+interface ChartsSectionProps {
+  refreshKey?: number
+}
+
+export function ChartsSection({ refreshKey = 0 }: ChartsSectionProps) {
   const [students, setStudents] = useState<Student[]>([])
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null)
   const [loading, setLoading] = useState(true)
@@ -61,7 +65,7 @@ export function ChartsSection() {
     }
 
     fetchData()
-  }, [])
+  }, [refreshKey])
 
   if (loading) {
     return (

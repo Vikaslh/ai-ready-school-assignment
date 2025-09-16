@@ -64,21 +64,21 @@ export default function DashboardPage() {
 
         <div key={refreshKey}>
           {/* Overview Cards */}
-          <OverviewCards />
+          <OverviewCards refreshKey={refreshKey} />
 
           {/* Charts Section */}
           <div className="mt-8">
-            <ChartsSection />
+            <ChartsSection refreshKey={refreshKey} />
           </div>
 
           {/* Students Table */}
           <div className="mt-8">
-            <StudentsTable />
+            <StudentsTable refreshKey={refreshKey} />
           </div>
 
           {/* Insights Section */}
           <div className="mt-8">
-            <InsightsSection />
+            <InsightsSection refreshKey={refreshKey} />
           </div>
         </div>
       </main>

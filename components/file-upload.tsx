@@ -146,7 +146,7 @@ export function FileUpload({ onUploadSuccess }: FileUploadProps) {
           <Upload className="h-5 w-5" />
           Upload Dataset
         </CardTitle>
-        <CardDescription>Upload your own student data CSV file or use the generated sample data</CardDescription>
+        <CardDescription></CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">

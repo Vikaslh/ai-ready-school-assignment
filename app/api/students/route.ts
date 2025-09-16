@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { getUploadedDataset, hasUploadedData, generateMockStudents } from "@/lib/data-storage"
+import { getUploadedDataset, hasUploadedData } from "@/lib/data-storage"
 
 export async function GET() {
   try {
@@ -18,15 +18,12 @@ export async function GET() {
         filename: uploadedDataset.filename,
       })
     } else {
-      console.log("[v0] No uploaded data found, generating mock student data")
-      const students = generateMockStudents()
-      console.log("[v0] Generated", students.length, "mock students")
-
+      console.log("[v0] No uploaded data found")
       return NextResponse.json({
         success: true,
-        data: students,
-        total: students.length,
-        source: "mock",
+        data: [],
+        total: 0,
+        source: "none",
       })
     }
   } catch (error) {

@@ -13,7 +13,11 @@ interface OverviewData {
   averageAssessmentScore: number
 }
 
-export function OverviewCards() {
+interface OverviewCardsProps {
+  refreshKey?: number
+}
+
+export function OverviewCards({ refreshKey = 0 }: OverviewCardsProps) {
   const [data, setData] = useState<OverviewData | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -33,7 +37,7 @@ export function OverviewCards() {
     }
 
     fetchData()
-  }, [])
+  }, [refreshKey])
 
   if (loading) {
     return (
